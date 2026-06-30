@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>True Agency — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a; --surface:#141414; --surface-2:#1a1a1a;
+    --hairline:#272727; --gold:#c9a14a; --gold-bright:#e0bc6b;
+    --ink:#f3f0e9; --muted:#8c8c8c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px 20px;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(255,255,255,0.015) 39px),
+      repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(255,255,255,0.015) 39px);
+  }
+  a{color:inherit;text-decoration:none;}
+
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:54px;}
+  .brand-mark{
+    width:36px;height:36px;border:1px solid var(--gold);transform:rotate(45deg);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .brand-mark span{transform:rotate(-45deg);font-family:'Fraunces',serif;color:var(--gold);font-size:16px;}
+  .brand-name{font-family:'Fraunces',serif;font-size:24px;}
+
+  .panel{
+    width:100%;max-width:420px;background:var(--surface);border:1px solid var(--hairline);
+    padding:42px 38px;text-align:center;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);
+    letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
+  }
+  h1{font-family:'Fraunces',serif;font-weight:500;font-size:26px;margin-bottom:10px;}
+  .panel p{color:var(--muted);font-size:13.5px;line-height:1.6;margin-bottom:34px;}
+
+  .role-options{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+  .role-btn{
+    display:flex;align-items:center;gap:14px;text-align:left;
+    border:1px solid var(--hairline);background:var(--surface-2);
+    padding:16px 18px;transition:border-color .2s ease, background .2s ease;
+  }
+  .role-btn:hover{border-color:var(--gold);background:#1f1c14;}
+  .role-icon{
+    width:36px;height:36px;border:1px solid var(--hairline);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--gold);
+  }
+  .role-text .t{font-family:'Fraunces',serif;font-size:15.5px;}
+  .role-text .d{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:2px;letter-spacing:0.3px;}
+
+  .divider{display:flex;align-items:center;gap:14px;margin:26px 0;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--hairline);}
+
+  .field{text-align:left;margin-bottom:14px;}
+  .field label{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px;}
+  .field input{
+    width:100%;background:var(--surface-2);border:1px solid var(--hairline);color:var(--ink);
+    padding:11px 13px;font-family:'Inter',sans-serif;font-size:14px;
+  }
+  .field input:focus{outline:none;border-color:var(--gold);}
+
+  .signin-btn{
+    width:100%;background:var(--gold);color:#0a0a0a;padding:13px;font-size:14px;font-weight:600;
+    margin-top:8px;letter-spacing:0.3px;transition:background .2s ease;
+  }
+  .signin-btn:hover{background:var(--gold-bright);}
+
+  .foot-note{margin-top:30px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+
+  <div class="brand">
+    <div class="brand-mark"><span>T</span></div>
+    <div class="brand-name">True Agency</div>
+  </div>
+
+  <div class="panel">
+    <div class="eyebrow">Sign In</div>
+    <h1>Welcome back.</h1>
+    <p>Choose how you'd like to access the portal.</p>
+
+    <div class="role-options">
+      <a class="role-btn" href="agent.html">
+        <div class="role-icon">▦</div>
+        <div class="role-text">
+          <div class="t">Continue as Agent</div>
+          <div class="d">YOUR BOOK, PRODUCTION &amp; TRAINING</div>
+        </div>
+      </a>
+      <a class="role-btn" href="owner.html">
+        <div class="role-icon">◈</div>
+        <div class="role-text">
+          <div class="t">Continue as Agency Owner</div>
+          <div class="d">AGENCY-WIDE PERFORMANCE &amp; OVERSIGHT</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="divider">OR SIGN IN WITH EMAIL</div>
+
+    <form onsubmit="event.preventDefault(); window.location.href='agent.html';">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="you@trueagency.com" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••" required>
+      </div>
+      <button class="signin-btn" type="submit">Sign In</button>
+    </form>
+  </div>
+
+  <div class="foot-note">© 2026 True Agency. This is a demo build.</div>
+
+</body>
+</html>
