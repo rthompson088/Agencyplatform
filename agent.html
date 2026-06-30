@@ -6,6 +6,7 @@
 <title>True Agency — Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0a0a0a;
@@ -177,17 +178,17 @@
 <div class="topbar">
   <div class="topbar-left">True Agency Portal · Agent View</div>
   <div class="topbar-right">
-    <a href="owner.html" class="owner-link">Switch to Owner View</a>
-    <a href="index.html">Sign Out</a>
+    <a href="owner.html" class="owner-link" id="owner-switch-link" style="display:none;">Switch to Owner View</a>
+    <a href="#" onclick="handleSignOut(event)">Sign Out</a>
   </div>
 </div>
 <div style="display:flex;flex:1;min-height:0;">
 <aside class="sidebar">
   <div class="profile">
-    <div class="avatar">RT</div>
-    <div class="profile-name">Ryan Thompson <span class="verified">✓</span></div>
-    <div class="profile-date">JUNE 29, 2026</div>
-    <div class="profile-days">186 DAYS LEFT OF 2026</div>
+    <div class="avatar" id="p-avatar">··</div>
+    <div class="profile-name" id="p-name">Loading… <span class="verified">✓</span></div>
+    <div class="profile-date" id="p-date">—</div>
+    <div class="profile-days" id="p-days">—</div>
   </div>
 
   <hr class="div">
@@ -257,10 +258,10 @@
   </div>
 
   <div class="stats-strip">
-    <div class="stat-box"><div class="n">312</div><div class="l">Active Agents</div></div>
-    <div class="stat-box"><div class="n">$8.6M</div><div class="l">YTD Production</div></div>
-    <div class="stat-box"><div class="n">94%</div><div class="l">Persistency Rate</div></div>
-    <div class="stat-box"><div class="n">41</div><div class="l">Training Sessions</div></div>
+    <div class="stat-box"><div class="n" id="s-policies">—</div><div class="l">Active Policies</div></div>
+    <div class="stat-box"><div class="n" id="s-production">—</div><div class="l">YTD Production</div></div>
+    <div class="stat-box"><div class="n" id="s-dials">—</div><div class="l">Dials This Month</div></div>
+    <div class="stat-box"><div class="n" id="s-pending">—</div><div class="l">Pending Review</div></div>
   </div>
 
   <div class="schedule-section">
@@ -303,6 +304,61 @@
 </main>
 </div>
 </div>
+
+<script>
+  // ── CONFIGURE THESE TWO LINES WITH YOUR SUPABASE VALUES ──
+  const SUPABASE_URL = "https://bgeecekvzowrfaoxtibm.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJnZWVjZWt2em93cmZhb3h0aWJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjY0MzgsImV4cCI6MjA5ODQwMjQzOH0.Lt-68RB4FwnD_hcMs5bTXdcE9MRIBjj-NXiZy5pBDmM";
+  // ───────────────────────────────────────────────────────
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function handleSignOut(e){
+    e.preventDefault();
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  }
+
+  async function loadDashboard(){
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user){
+      window.location.href = 'index.html';
+      return;
+    }
+
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if(!profile) return;
+
+    if(profile.role === 'owner'){
+      document.getElementById('owner-switch-link').style.display = 'inline-block';
+    }
+
+    document.getElementById('p-avatar').textContent = profile.avatar_initials || '—';
+    document.getElementById('p-name').innerHTML = (profile.name || 'Agent') + ' <span class="verified">✓</span>';
+
+    const now = new Date();
+    document.getElementById('p-date').textContent = now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+    const endOfYear = new Date(now.getFullYear(),11,31);
+    const daysLeft = Math.round((endOfYear - now)/(1000*60*60*24));
+    document.getElementById('p-days').textContent = daysLeft + ' DAYS LEFT OF ' + now.getFullYear();
+
+    const { data: policies } = await sb.from('policies').select('*').eq('agent_id', user.id);
+    const activeCount = (policies||[]).filter(p=>p.status==='active').length;
+    const pendingCount = (policies||[]).filter(p=>p.status==='pending' || p.status==='in_review').length;
+    document.getElementById('s-policies').textContent = activeCount;
+    document.getElementById('s-pending').textContent = pendingCount;
+
+    const { data: production } = await sb.from('production_entries').select('amount').eq('agent_id', user.id);
+    const totalProd = (production||[]).reduce((sum,p)=>sum+Number(p.amount),0);
+    document.getElementById('s-production').textContent = '$' + totalProd.toLocaleString();
+
+    const { data: dials } = await sb.from('dial_logs').select('count').eq('agent_id', user.id);
+    const totalDials = (dials||[]).reduce((sum,d)=>sum+Number(d.count),0);
+    document.getElementById('s-dials').textContent = totalDials;
+  }
+
+  loadDashboard();
+</script>
 
 </body>
 </html>

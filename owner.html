@@ -6,6 +6,7 @@
 <title>True Agency — Owner Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0a0a0a; --sidebar:#0d0d0d; --surface:#141414; --surface-2:#1a1a1a;
@@ -184,7 +185,7 @@
   <div class="topbar-left">True Agency Portal · Owner View</div>
   <div class="topbar-right">
     <a href="agent.html" class="agent-link">Switch to Agent View</a>
-    <a href="index.html">Sign Out</a>
+    <a href="#" onclick="handleSignOut(event)">Sign Out</a>
   </div>
 </div>
 <div style="display:flex;flex:1;min-height:0;">
@@ -211,23 +212,23 @@
   <a class="nav-item"><span class="nav-icon">▢</span>Recruiting</a>
   <a class="nav-item"><span class="nav-icon">⚙</span>Settings</a>
 
-  <div class="owner-foot">Logged in as<br><span style="color:var(--ink)">D. Whitfield · Owner</span></div>
+  <div class="owner-foot">Logged in as<br><span style="color:var(--ink)" id="owner-name">Loading...</span></div>
 </aside>
 
 <main class="main">
   <div class="page-head">
     <div>
       <h1>Agency Overview</h1>
-      <p>312 agents · 6 teams · across 24 states</p>
+      <p id="agency-sub">Loading agency data…</p>
     </div>
-    <div class="date-mono">MONDAY, JUNE 29, 2026</div>
+    <div class="date-mono" id="today-date">—</div>
   </div>
 
   <div class="top-stats">
-    <div class="tstat"><div class="n">$8.6M</div><div class="l">YTD Production</div><div class="delta up">↑ 12.4% vs last month</div></div>
-    <div class="tstat"><div class="n">312</div><div class="l">Active Agents</div><div class="delta up">↑ 9 new this month</div></div>
-    <div class="tstat"><div class="n">94%</div><div class="l">Persistency Rate</div><div class="delta down">↓ 0.6% vs last month</div></div>
-    <div class="tstat"><div class="n">18,420</div><div class="l">Dials This Week</div><div class="delta up">↑ 5.1% vs last week</div></div>
+    <div class="tstat"><div class="n" id="t-production">—</div><div class="l">YTD Production</div></div>
+    <div class="tstat"><div class="n" id="t-agents">—</div><div class="l">Active Agents</div></div>
+    <div class="tstat"><div class="n" id="t-policies">—</div><div class="l">Total Policies</div></div>
+    <div class="tstat"><div class="n" id="t-dials">—</div><div class="l">Dials This Month</div></div>
   </div>
 
   <div class="dash-grid">
@@ -240,40 +241,8 @@
         <div class="lb-row head">
           <span>#</span><span>Agent</span><span>Production</span><span>Policies</span><span>Trend</span>
         </div>
-        <div class="lb-row" onclick="openAgent('marcus')">
-          <span class="rank">01</span>
-          <span class="agent-name"><span class="mini-avatar">MO</span>Marcus Osei</span>
-          <span class="lb-num">$214,200</span>
-          <span class="lb-num">38</span>
-          <span class="lb-badge up">↑ 18%</span>
-        </div>
-        <div class="lb-row" onclick="openAgent('jordan')">
-          <span class="rank">02</span>
-          <span class="agent-name"><span class="mini-avatar">JM</span>Jordan Marsh</span>
-          <span class="lb-num">$198,750</span>
-          <span class="lb-num">31</span>
-          <span class="lb-badge up">↑ 6%</span>
-        </div>
-        <div class="lb-row" onclick="openAgent('riya')">
-          <span class="rank">03</span>
-          <span class="agent-name"><span class="mini-avatar">RS</span>Riya Singh</span>
-          <span class="lb-num">$176,400</span>
-          <span class="lb-num">29</span>
-          <span class="lb-badge flat">→ 0%</span>
-        </div>
-        <div class="lb-row" onclick="openAgent('tasha')">
-          <span class="rank">04</span>
-          <span class="agent-name"><span class="mini-avatar">TB</span>Tasha Brandt</span>
-          <span class="lb-num">$152,900</span>
-          <span class="lb-num">24</span>
-          <span class="lb-badge down">↓ 4%</span>
-        </div>
-        <div class="lb-row" onclick="openAgent('devon')">
-          <span class="rank">05</span>
-          <span class="agent-name"><span class="mini-avatar">DK</span>Devon Keller</span>
-          <span class="lb-num">$141,300</span>
-          <span class="lb-num">22</span>
-          <span class="lb-badge up">↑ 11%</span>
+        <div id="leaderboard-rows">
+          <div style="padding:18px 22px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;">Loading agents…</div>
         </div>
       </div>
 
@@ -282,20 +251,8 @@
           <h2>Team Rollup</h2>
           <span class="sub">By Hierarchy</span>
         </div>
-        <div class="team-card">
-          <div class="team-top"><span class="team-lead">Marcus Osei — Team Lead</span><span class="team-count">21 agents</span></div>
-          <div class="bar-track"><div class="bar-fill" style="width:88%"></div></div>
-          <div class="team-bottom"><span>$2.1M production</span><span>96% persistency</span></div>
-        </div>
-        <div class="team-card">
-          <div class="team-top"><span class="team-lead">Tasha Brandt — Team Lead</span><span class="team-count">14 agents</span></div>
-          <div class="bar-track"><div class="bar-fill" style="width:61%"></div></div>
-          <div class="team-bottom"><span>$1.4M production</span><span>91% persistency</span></div>
-        </div>
-        <div class="team-card">
-          <div class="team-top"><span class="team-lead">Riya Singh — Team Lead</span><span class="team-count">12 agents</span></div>
-          <div class="bar-track"><div class="bar-fill" style="width:54%"></div></div>
-          <div class="team-bottom"><span>$1.1M production</span><span>93% persistency</span></div>
+        <div id="team-rollup-rows">
+          <div style="padding:18px 22px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;">Loading teams…</div>
         </div>
       </div>
     </div>
@@ -306,40 +263,8 @@
           <h2>Activity Feed</h2>
           <span class="sub">Live</span>
         </div>
-        <div class="feed-row">
-          <div class="feed-dot policy"></div>
-          <div>
-            <div class="feed-text"><strong>Marcus Osei</strong> closed a policy — Bauer Holdings LLC</div>
-            <div class="feed-time">12 min ago</div>
-          </div>
-        </div>
-        <div class="feed-row">
-          <div class="feed-dot deposit"></div>
-          <div>
-            <div class="feed-text"><strong>Jordan Marsh</strong> logged a deposit — $4,200</div>
-            <div class="feed-time">38 min ago</div>
-          </div>
-        </div>
-        <div class="feed-row">
-          <div class="feed-dot dial"></div>
-          <div>
-            <div class="feed-text"><strong>Devon Keller</strong> logged 84 dials</div>
-            <div class="feed-time">1 hr ago</div>
-          </div>
-        </div>
-        <div class="feed-row">
-          <div class="feed-dot policy"></div>
-          <div>
-            <div class="feed-text"><strong>Riya Singh</strong> closed a policy — Osei, A. &amp; K.</div>
-            <div class="feed-time">2 hr ago</div>
-          </div>
-        </div>
-        <div class="feed-row">
-          <div class="feed-dot dial"></div>
-          <div>
-            <div class="feed-text"><strong>Tasha Brandt</strong> logged 61 dials</div>
-            <div class="feed-time">3 hr ago</div>
-          </div>
+        <div id="activity-feed-rows">
+          <div style="padding:18px 22px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;">Loading activity…</div>
         </div>
       </div>
     </div>
@@ -367,42 +292,165 @@
     </div>
 
     <div class="drawer-section-title">Recent Policies</div>
-    <div class="drawer-list-row"><span>Bauer Holdings LLC</span><span>$11,200/yr</span></div>
-    <div class="drawer-list-row"><span>Harmon, T.</span><span>$2,140/yr</span></div>
-    <div class="drawer-list-row"><span>Delacroix, R.</span><span>$880/yr</span></div>
+    <div id="d-policies-list">
+      <div class="drawer-list-row"><span>—</span><span>—</span></div>
+    </div>
 
     <div style="height:24px"></div>
     <div class="drawer-section-title">Monthly Trend</div>
-    <div class="drawer-list-row"><span>April</span><span>$162,000</span></div>
-    <div class="drawer-list-row"><span>May</span><span>$181,400</span></div>
-    <div class="drawer-list-row"><span>June</span><span>$214,200</span></div>
+    <div id="d-trend-list">
+      <div class="drawer-list-row"><span>—</span><span>—</span></div>
+    </div>
   </div>
 </div>
 
 <script>
-  const agents = {
-    marcus:{name:'Marcus Osei',role:'Team Lead · Tier 1',avatar:'MO',prod:'$214,200',policies:'38',dials:'412',team:'21'},
-    jordan:{name:'Jordan Marsh',role:'Senior Agent · Tier 2',avatar:'JM',prod:'$198,750',policies:'31',dials:'389',team:'0'},
-    riya:{name:'Riya Singh',role:'Team Lead · Tier 1',avatar:'RS',prod:'$176,400',policies:'29',dials:'355',team:'12'},
-    tasha:{name:'Tasha Brandt',role:'Team Lead · Tier 1',avatar:'TB',prod:'$152,900',policies:'24',dials:'301',team:'14'},
-    devon:{name:'Devon Keller',role:'Senior Agent · Tier 2',avatar:'DK',prod:'$141,300',policies:'22',dials:'287',team:'0'}
-  };
-  function openAgent(id){
-    const a = agents[id];
-    document.getElementById('d-name').textContent = a.name;
-    document.getElementById('d-role').textContent = a.role;
-    document.getElementById('d-avatar').textContent = a.avatar;
-    document.getElementById('d-prod').textContent = a.prod;
-    document.getElementById('d-policies').textContent = a.policies;
-    document.getElementById('d-dials').textContent = a.dials;
-    document.getElementById('d-team').textContent = a.team;
+  // ── CONFIGURE THESE TWO LINES WITH YOUR SUPABASE VALUES ──
+  const SUPABASE_URL = "https://bgeecekvzowrfaoxtibm.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJnZWVjZWt2em93cmZhb3h0aWJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4MjY0MzgsImV4cCI6MjA5ODQwMjQzOH0.Lt-68RB4FwnD_hcMs5bTXdcE9MRIBjj-NXiZy5pBDmM";
+  // ───────────────────────────────────────────────────────
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let agencyAgents = []; // cached for drawer lookups
+
+  async function handleSignOut(e){
+    e.preventDefault();
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  }
+
+  async function loadOwnerDashboard(){
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user){ window.location.href = 'index.html'; return; }
+
+    const { data: myProfile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if(!myProfile || myProfile.role !== 'owner'){
+      // Not an owner — send them to their own portal instead
+      window.location.href = 'agent.html';
+      return;
+    }
+
+    document.getElementById('owner-name').textContent = myProfile.name + ' · Owner';
+
+    const now = new Date();
+    document.getElementById('today-date').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+
+    // All agents in this owner's agency
+    const { data: agents } = await sb.from('profiles').select('*').eq('agency_id', myProfile.agency_id);
+    agencyAgents = agents || [];
+    document.getElementById('agency-sub').textContent = agencyAgents.length + ' agents in your agency';
+    document.getElementById('t-agents').textContent = agencyAgents.length;
+
+    // All policies + production + dials across the agency (RLS scopes this automatically)
+    const agentIds = agencyAgents.map(a => a.id);
+    const { data: allPolicies } = await sb.from('policies').select('*').in('agent_id', agentIds.length ? agentIds : ['00000000-0000-0000-0000-000000000000']);
+    const { data: allProduction } = await sb.from('production_entries').select('*').in('agent_id', agentIds.length ? agentIds : ['00000000-0000-0000-0000-000000000000']);
+    const { data: allDials } = await sb.from('dial_logs').select('*').in('agent_id', agentIds.length ? agentIds : ['00000000-0000-0000-0000-000000000000']);
+
+    const totalProd = (allProduction||[]).reduce((s,p)=>s+Number(p.amount),0);
+    document.getElementById('t-production').textContent = '$' + totalProd.toLocaleString();
+    document.getElementById('t-policies').textContent = (allPolicies||[]).length;
+    document.getElementById('t-dials').textContent = (allDials||[]).reduce((s,d)=>s+Number(d.count),0);
+
+    // Build per-agent totals for the leaderboard
+    const perAgent = agencyAgents.map(a => {
+      const prod = (allProduction||[]).filter(p=>p.agent_id===a.id).reduce((s,p)=>s+Number(p.amount),0);
+      const policyCount = (allPolicies||[]).filter(p=>p.agent_id===a.id).length;
+      const dials = (allDials||[]).filter(d=>d.agent_id===a.id).reduce((s,d)=>s+Number(d.count),0);
+      return { ...a, prod, policyCount, dials };
+    }).sort((x,y)=>y.prod-x.prod);
+
+    // Leaderboard
+    const lbContainer = document.getElementById('leaderboard-rows');
+    if(perAgent.length === 0){
+      lbContainer.innerHTML = '<div style="padding:18px 22px;color:var(--muted);font-family:\'JetBrains Mono\',monospace;font-size:12px;">No agents yet — invite your team to sign up.</div>';
+    } else {
+      lbContainer.innerHTML = perAgent.map((a,i) => `
+        <div class="lb-row" onclick="openAgent('${a.id}')">
+          <span class="rank">${String(i+1).padStart(2,'0')}</span>
+          <span class="agent-name"><span class="mini-avatar">${a.avatar_initials||'—'}</span>${a.name||'Unnamed'}</span>
+          <span class="lb-num">$${a.prod.toLocaleString()}</span>
+          <span class="lb-num">${a.policyCount}</span>
+          <span class="lb-badge flat">—</span>
+        </div>
+      `).join('');
+    }
+
+    // Team rollup — group by team_lead role
+    const teamLeads = agencyAgents.filter(a => a.role === 'team_lead' || a.role === 'owner');
+    const rollupContainer = document.getElementById('team-rollup-rows');
+    if(teamLeads.length === 0){
+      rollupContainer.innerHTML = '<div style="padding:18px 22px;color:var(--muted);font-family:\'JetBrains Mono\',monospace;font-size:12px;">No teams set up yet.</div>';
+    } else {
+      const maxProd = Math.max(...perAgent.map(a=>a.prod), 1);
+      rollupContainer.innerHTML = teamLeads.map(lead => {
+        const leadData = perAgent.find(a=>a.id===lead.id) || {prod:0};
+        const pct = Math.round((leadData.prod/maxProd)*100);
+        return `
+          <div class="team-card">
+            <div class="team-top"><span class="team-lead">${lead.name} — Team Lead</span><span class="team-count">—</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            <div class="team-bottom"><span>$${leadData.prod.toLocaleString()} production</span><span>—</span></div>
+          </div>`;
+      }).join('');
+    }
+
+    // Activity feed
+    const { data: activity } = await sb.from('activity_feed').select('*').eq('agency_id', myProfile.agency_id).order('created_at',{ascending:false}).limit(10);
+    const feedContainer = document.getElementById('activity-feed-rows');
+    if(!activity || activity.length === 0){
+      feedContainer.innerHTML = '<div style="padding:18px 22px;color:var(--muted);font-family:\'JetBrains Mono\',monospace;font-size:12px;">No activity yet.</div>';
+    } else {
+      feedContainer.innerHTML = activity.map(item => `
+        <div class="feed-row">
+          <div class="feed-dot ${item.type}"></div>
+          <div>
+            <div class="feed-text">${item.description}</div>
+            <div class="feed-time">${new Date(item.created_at).toLocaleString()}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  async function openAgent(agentId){
+    const a = agencyAgents.find(x => x.id === agentId);
+    if(!a) return;
+
+    document.getElementById('d-name').textContent = a.name || 'Unnamed';
+    document.getElementById('d-role').textContent = (a.role||'agent') + ' · ' + (a.tier||'');
+    document.getElementById('d-avatar').textContent = a.avatar_initials || '—';
+
+    const { data: policies } = await sb.from('policies').select('*').eq('agent_id', agentId).order('created_at',{ascending:false}).limit(5);
+    const { data: production } = await sb.from('production_entries').select('*').eq('agent_id', agentId).order('month',{ascending:true});
+    const { data: dials } = await sb.from('dial_logs').select('count').eq('agent_id', agentId);
+
+    const totalProd = (production||[]).reduce((s,p)=>s+Number(p.amount),0);
+    document.getElementById('d-prod').textContent = '$' + totalProd.toLocaleString();
+    document.getElementById('d-policies').textContent = (policies||[]).length;
+    document.getElementById('d-dials').textContent = (dials||[]).reduce((s,d)=>s+Number(d.count),0);
+    document.getElementById('d-team').textContent = agencyAgents.filter(x=>x.upline_id===agentId).length;
+
+    const policiesList = document.getElementById('d-policies-list');
+    policiesList.innerHTML = (policies&&policies.length) ? policies.map(p=>`
+      <div class="drawer-list-row"><span>${p.client_name||'—'}</span><span>$${Number(p.premium||0).toLocaleString()}/yr</span></div>
+    `).join('') : '<div class="drawer-list-row"><span>No policies yet</span><span>—</span></div>';
+
+    const trendList = document.getElementById('d-trend-list');
+    trendList.innerHTML = (production&&production.length) ? production.map(p=>`
+      <div class="drawer-list-row"><span>${new Date(p.month).toLocaleDateString('en-US',{month:'long'})}</span><span>$${Number(p.amount).toLocaleString()}</span></div>
+    `).join('') : '<div class="drawer-list-row"><span>No production logged</span><span>—</span></div>';
+
     document.getElementById('drawer').classList.add('open');
     document.getElementById('overlay').classList.add('open');
   }
+
   function closeAgent(){
     document.getElementById('drawer').classList.remove('open');
     document.getElementById('overlay').classList.remove('open');
   }
+
+  loadOwnerDashboard();
 </script>
 
 </body>
